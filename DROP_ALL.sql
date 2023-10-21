@@ -27,3 +27,4 @@ DROP TABLE disposicion
 DROP TABLE provincia
 DROP TABLE localidad
 DROP TABLE barrio
+drop table estadoanuncio
