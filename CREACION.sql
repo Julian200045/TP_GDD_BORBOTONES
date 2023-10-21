@@ -50,7 +50,7 @@ CREATE TABLE Orientacion (
 
 CREATE TABLE Caracteristica (
     caracteristica_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    caracteristica_descripcion nvarchar(100)
+    caracteristica_detalle nvarchar(50)
 )
 
 CREATE TABLE Inmueble (
@@ -114,7 +114,7 @@ CREATE TABLE TiposPeriodosAnuncio (
     tipoPeriodo_detalle nvarchar(50)
 )
 
-CREATE TABLE EstadosAnuncio (
+CREATE TABLE EstadoAnuncio (
     estadoAnuncio_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     estadoAnuncio_Detalle nvarchar(50)
 )
@@ -130,7 +130,7 @@ CREATE TABLE Anuncio (
     moneda_codigo numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo),
     inmueble_codigo numeric(18,0) FOREIGN KEY REFERENCES Inmueble(inmueble_codigo),
     persona_codigo numeric(18,0) FOREIGN KEY REFERENCES Persona(persona_codigo),
-    estadoAnuncio_codigo numeric(18,0) FOREIGN KEY REFERENCES EstadosAnuncio(estadoAnuncio_codigo),
+    estadoAnuncio_codigo numeric(18,0) FOREIGN KEY REFERENCES EstadoAnuncio(estadoAnuncio_codigo),
     tipoPeriodo_codigo numeric(18,0) FOREIGN KEY REFERENCES TiposPeriodosAnuncio(tipoPeriodo_codigo),
     anuncio_fechaPublicacion smalldatetime,
     anuncio_precioPublicado numeric(18,2),
