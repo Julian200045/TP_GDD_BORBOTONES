@@ -151,7 +151,8 @@ CREATE TABLE Alquiler (
     alquiler_fecha_fin smalldatetime,
     alquiler_cantidad_periodos numeric(18,0),
     alquiler_deposito numeric(18,0),
-    alquiler_comision numeric(18,0)
+    alquiler_comision numeric(18,0),
+    alquiler_gastos_averiguaciones numeric(18,2)
 )
 
 CREATE TABLE ImporteXPeriodos (
