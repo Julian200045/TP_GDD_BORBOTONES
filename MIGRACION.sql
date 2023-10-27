@@ -134,40 +134,38 @@ WHERE sucursal_localidad IS NOT NULL
 SET IDENTITY_INSERT sucursal off
 
 --AGENTE
---INSERT INTO agente (persona_codigo,sucursal_codigo)
---select persona_codigo,SUCURSAL_CODIGO from gd_esquema.Maestra
---join persona on persona_dni = agente_dni and persona_nombre = agente_nombre
+INSERT INTO agente (persona_codigo,sucursal_codigo)
+select distinct(persona_codigo),SUCURSAL_CODIGO from gd_esquema.Maestra
+join persona on persona_dni = agente_dni and persona_nombre = agente_nombre
 
 --ALQUILER FALTA ANUNCIO ????????
-SET IDENTITY_INSERT alquiler on
-INSERT INTO Alquiler (alquiler_codigo, alquiler_anuncio_codigo, alquiler_estado, alquiler_fecha_inicio, alquiler_fecha_fin, 
-                      alquiler_cantidad_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averiguaciones)
-SELECT distinct(alquiler_codigo), anuncio_codigo, estado_alquiler_codigo, alquiler_fecha_inicio, alquiler_fecha_fin, 
-        alquiler_cant_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averigua FROM gd_esquema.Maestra
-JOIN EstadoAlquiler ON estado_alquiler_detalle = alquiler_estado
-SET IDENTITY_INSERT alquiler off
+--SET IDENTITY_INSERT alquiler on
+--INSERT INTO Alquiler (alquiler_codigo, alquiler_anuncio_codigo, alquiler_estado, alquiler_fecha_inicio, alquiler_fecha_fin, 
+  --                    alquiler_cantidad_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averiguaciones)
+--SELECT distinct(alquiler_codigo), anuncio_codigo, estado_alquiler_codigo, alquiler_fecha_inicio, alquiler_fecha_fin, 
+ --       alquiler_cant_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averigua FROM gd_esquema.Maestra
+--JOIN EstadoAlquiler ON estado_alquiler_detalle = alquiler_estado
+--SET IDENTITY_INSERT alquiler off
 
 --INQUILINO
---SET IDENTITY_INSERT Inquilino on 
-INSERT INTO Inquilino (persona_codigo,alquiler_codigo)
-select p.persona_codigo, m.alquiler_codigo from Persona p 
-join gd_esquema.Maestra m on persona_dni = inquilino_dni 
+-- No se puede hacer porque falta que alquiler sea primary key en otra tabla
+/*INSERT INTO Inquilino (persona_codigo,alquiler_codigo)
+select distinct(p.persona_codigo), m.alquiler_codigo from Persona p 
+join gd_esquema.Maestra m on persona_dni = inquilino_dni */
+
 
 --COMPRADOR
---SET IDENTITY_INSERT Comprador on 
-INSERT INTO Comprador (persona_codigo,venta_codigo)
+-- No se puede hacer porque falta que comprador sea primary key en otra tabla
+/*INSERT INTO Comprador (persona_codigo,venta_codigo)
 select p.persona_codigo, m.venta_codigo from Persona p 
-join gd_esquema.Maestra m on persona_dni = comprador_dni
+join gd_esquema.Maestra m on persona_dni = comprador_dni*/
 
---PROPIETARIO
---SET IDENTITY_INSERT Propietario on 
-INSERT INTO Propietario (persona_codigo,inmueble_codigo)
-select p.persona_codigo, m.inmueble_codigo from Persona p 
-join gd_esquema.Maestra m on persona_dni = propietario_dni
+
 
 --INMUEBLE
 SET IDENTITY_INSERT inmueble on
--- FALTA INSERTTTT
+insert into inmueble (inmueble_codigo,inmueble_tipo, inmueble_barrio, inmueble_ambientes, inmueble_orientacion, inmueble_disposicion, inmueble_estado,
+				inmueble_nombre, inmueble_descripcion, inmueble_direccion, inmueble_superficie, inmueble_antiguedad, inmueble_expensas)
 select distinct(inmueble_codigo), 
 	tipo_inmueble_codigo, 
 		barrio_codigo, 
@@ -186,6 +184,14 @@ join estadoinmueble on estado_inmueble_detalle = inmueble_estado
 where inmueble_codigo is not null
 
 SET IDENTITY_INSERT inmueble off
+
+
+--PROPIETARIO
+INSERT INTO Propietario (persona_codigo,inmueble_codigo)
+select distinct(p.persona_codigo), m.inmueble_codigo from Persona p 
+join gd_esquema.Maestra m on persona_dni = propietario_dni
+select * from propietario
+
 
 --ANUNCIO
 --SET IDENTITY_INSERT Anuncio on 

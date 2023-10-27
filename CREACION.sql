@@ -61,9 +61,9 @@ CREATE TABLE Inmueble (
     inmueble_orientacion numeric(18,0) FOREIGN KEY REFERENCES Orientacion(orientacion_codigo),
     inmueble_disposicion numeric(18,0) FOREIGN KEY REFERENCES Disposicion(disposicion_codigo),
     inmueble_estado numeric(18,0) FOREIGN KEY REFERENCES EstadoInmueble(estado_inmueble_codigo),
-    inmueble_nombre nvarchar(50),
+    inmueble_nombre nvarchar(100),
     inmueble_descripcion nvarchar(100),
-    inmueble_direccion nvarchar(50),
+    inmueble_direccion nvarchar(100),
     inmueble_superficie numeric(10,0),
     inmueble_antiguedad numeric(4,0),
     inmueble_expensas numeric(18,2)

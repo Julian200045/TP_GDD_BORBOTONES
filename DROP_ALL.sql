@@ -9,7 +9,7 @@ DROP TABLE propietario
 DROP TABLE moneda
 DROP TABLE mediodepago
 DROP TABLE tiposperiodosanuncio
-DROP TABLE estadosanuncio
+DROP TABLE estadoanuncio
 DROP TABLE tipooperacion
 DROP TABLE anuncio
 DROP TABLE estadoalquiler
