@@ -25,7 +25,7 @@ CREATE TABLE Sucursal (
 
 CREATE TABLE TipoInmueble (
     tipo_inmueble_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    tipo_inmueble_detalle nvarchar(50)
+    tipo_inmueble_detalle nvarchar(100)
 )
 
 CREATE TABLE EstadoInmueble (
@@ -101,7 +101,7 @@ CREATE TABLE Propietario (
 
 CREATE TABLE Moneda (
     moneda_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    moneda_detalle nvarchar(50)
+    moneda_detalle nvarchar(100)
 )
 
 CREATE TABLE MedioDePago (
@@ -111,12 +111,12 @@ CREATE TABLE MedioDePago (
 
 CREATE TABLE TiposPeriodosAnuncio (
     tipoPeriodo_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    tipoPeriodo_detalle nvarchar(50)
+    tipoPeriodo_detalle nvarchar(100)
 )
 
 CREATE TABLE EstadoAnuncio (
     estadoAnuncio_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    estadoAnuncio_Detalle nvarchar(50)
+    estadoAnuncio_Detalle nvarchar(100)
 )
 
 CREATE TABLE TipoOperacion (
@@ -125,13 +125,13 @@ CREATE TABLE TipoOperacion (
 )
 
 CREATE TABLE Anuncio (
-    anuncio_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    tipoOperacion_codigo numeric(18,0) FOREIGN KEY REFERENCES TipoOperacion(tipoOperacion_codigo),
-    moneda_codigo numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo),
-    inmueble_codigo numeric(18,0) FOREIGN KEY REFERENCES Inmueble(inmueble_codigo),
-    persona_codigo numeric(18,0) FOREIGN KEY REFERENCES Persona(persona_codigo),
-    estadoAnuncio_codigo numeric(18,0) FOREIGN KEY REFERENCES EstadoAnuncio(estadoAnuncio_codigo),
-    tipoPeriodo_codigo numeric(18,0) FOREIGN KEY REFERENCES TiposPeriodosAnuncio(tipoPeriodo_codigo),
+    anuncio_codigo numeric(19,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    anuncio_tipoOperacion numeric(18,0) FOREIGN KEY REFERENCES TipoOperacion(tipoOperacion_codigo),
+    anuncio_moneda numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo),
+    anuncio_inmueble numeric(18,0) FOREIGN KEY REFERENCES Inmueble(inmueble_codigo),
+    anuncio_agente numeric(18,0) FOREIGN KEY REFERENCES Agente(agente_codigo),
+    anuncio_estadoAnuncio numeric(18,0) FOREIGN KEY REFERENCES EstadoAnuncio(estadoAnuncio_codigo),
+    anuncio_tipoPeriodo numeric(18,0) FOREIGN KEY REFERENCES TiposPeriodosAnuncio(tipoPeriodo_codigo),
     anuncio_fechaPublicacion smalldatetime,
     anuncio_precioPublicado numeric(18,2),
     anuncio_costoAnuncio numeric(18,2),
@@ -145,7 +145,7 @@ CREATE TABLE EstadoAlquiler (
 
 CREATE TABLE Alquiler (
     alquiler_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    alquiler_anuncio_codigo numeric(18,0) FOREIGN KEY REFERENCES Anuncio(anuncio_codigo),
+    alquiler_anuncio_codigo numeric(19,0) FOREIGN KEY REFERENCES Anuncio(anuncio_codigo),
     alquiler_estado numeric(18,0) FOREIGN KEY REFERENCES EstadoAlquiler(estado_alquiler_codigo),
     alquiler_fecha_inicio smalldatetime,
     alquiler_fecha_fin smalldatetime,
@@ -188,7 +188,7 @@ CREATE TABLE Inquilino (
 CREATE TABLE Venta (
     venta_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     venta_moneda numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo) NOT NULL,
-    venta_anuncio numeric(18,0) FOREIGN KEY REFERENCES Anuncio(anuncio_codigo) NOT NULL,
+    venta_anuncio numeric(19,0) FOREIGN KEY REFERENCES Anuncio(anuncio_codigo) NOT NULL,
     venta_feacha smalldatetime,
     venta_comision numeric(18,2),
     venta_precio numeric(18,2)

@@ -194,8 +194,20 @@ select * from propietario
 
 
 --ANUNCIO
---SET IDENTITY_INSERT Anuncio on 
---INSERT INTO Anuncio(anuncio_codigo, tipoOperacion_codigo,moneda_codigo,inmueble_codigo,persona_codigo,estadoAnuncio_codigo,tipoPeriodo_codigo,anuncio_fechaPublicacion,anuncio_precioPublicado,anuncio_)
+SET IDENTITY_INSERT Anuncio on 
+
+INSERT INTO Anuncio(anuncio_codigo, anuncio_tipoOperacion,anuncio_moneda,anuncio_inmueble,anuncio_agente,anuncio_estadoAnuncio,anuncio_tipoPeriodo,anuncio_fechaPublicacion,anuncio_precioPublicado,anuncio_costoAnuncio,anuncio_fechaFinalizacion)
+SELECT DISTINCT(anuncio_codigo), tipoOp.tipoOperacion_codigo, moneda.moneda_codigo, inm.inmueble_codigo, agente.agente_codigo, ean.estadoAnuncio_codigo, tipoPe.tipoPeriodo_codigo, ANUNCIO_FECHA_PUBLICACION,ANUNCIO_PRECIO_PUBLICADO, ANUNCIO_COSTO_ANUNCIO, ANUNCIO_FECHA_FINALIZACION
+FROM gd_esquema.Maestra maestra
+JOIN TipoOperacion tipoOp on tipoOp.tipoOperacion_detalle = maestra.ANUNCIO_TIPO_OPERACION
+JOIN Moneda moneda on moneda.moneda_detalle = maestra.ANUNCIO_MONEDA
+JOIN Inmueble inm on inm.inmueble_descripcion = maestra.inmueble_codigo
+JOIN Persona p on p.persona_dni = maestra.AGENTE_DNI
+JOIN Agente agente on agente.persona_codigo = p.persona_codigo
+JOIN EstadoAnuncio ean on ean.estadoAnuncio_Detalle = maestra.anuncio_estado
+JOIN TiposPeriodosAnuncio tipoPe on tipoPe.tipoPeriodo_detalle = maestra.ANUNCIO_TIPO_PERIODO
+
+SET IDENTITY_INSERT Anuncio off
 --alamitad
 
 GO
