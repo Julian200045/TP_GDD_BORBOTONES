@@ -70,8 +70,11 @@ CREATE TABLE Inmueble (
 )
 
 CREATE TABLE CaracteristicaPorInmueble (
-    caracteristica_codigo numeric(18,0) FOREIGN KEY REFERENCES Caracteristica(caracteristica_codigo),
-    inmueble_codigo numeric(18,0) FOREIGN KEY REFERENCES Inmueble(inmueble_codigo)
+    caracInmueble_caracteristica numeric(18,0) NOT NULL,
+	caracInmueble_inmueble numeric(18,0) NOT NULL,
+	PRIMARY KEY(caracInmueble_caracteristica,caracInmueble_inmueble),
+	FOREIGN KEY (caracInmueble_caracteristica) REFERENCES Caracteristica(caracteristica_codigo),
+    FOREIGN KEY (caracInmueble_inmueble) REFERENCES Inmueble(inmueble_codigo)
 )
 
 CREATE TABLE Persona (
