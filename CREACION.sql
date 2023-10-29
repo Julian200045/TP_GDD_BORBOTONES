@@ -5,13 +5,13 @@ CREATE TABLE Provincia (
 
 CREATE TABLE Localidad (
     localidad_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    provincia_codigo numeric(18,0) FOREIGN KEY REFERENCES Provincia(provincia_codigo),
+    localidad_provincia numeric(18,0) FOREIGN KEY REFERENCES Provincia(provincia_codigo),
     localidad_detalle nvarchar(50)
 )
 
 CREATE TABLE Barrio (
     barrio_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    localidad_codigo numeric(18,0) FOREIGN KEY REFERENCES Localidad(localidad_codigo),
+    barrio_localidad numeric(18,0) FOREIGN KEY REFERENCES Localidad(localidad_codigo),
     barrio_detalle nvarchar(50)
 )
 
@@ -90,16 +90,16 @@ CREATE TABLE Persona (
 
 CREATE TABLE Agente (
     agente_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    persona_codigo numeric(18,0) FOREIGN KEY REFERENCES Persona(persona_codigo),
-    sucursal_codigo numeric(18,0) FOREIGN KEY REFERENCES Sucursal(sucursal_codigo)
+    agente_persona numeric(18,0) FOREIGN KEY REFERENCES Persona(persona_codigo),
+    agente_sucursal numeric(18,0) FOREIGN KEY REFERENCES Sucursal(sucursal_codigo)
 )
 
 CREATE TABLE Propietario (
-    persona_codigo numeric(18,0) NOT NULL,
-    inmueble_codigo numeric(18,0) NOT NULL,
-    PRIMARY KEY(persona_codigo,inmueble_codigo),
-    FOREIGN KEY (persona_codigo) REFERENCES Persona(persona_codigo),
-    FOREIGN KEY (inmueble_codigo) REFERENCES Inmueble(inmueble_codigo)
+    propietario_persona numeric(18,0) NOT NULL,
+    propietario_inmueble numeric(18,0) NOT NULL,
+    PRIMARY KEY(propietario_persona,propietario_inmueble),
+    FOREIGN KEY (propietario_persona) REFERENCES Persona(persona_codigo),
+    FOREIGN KEY (propietario_inmueble) REFERENCES Inmueble(inmueble_codigo)
 )
 
 CREATE TABLE Moneda (
@@ -180,11 +180,11 @@ CREATE TABLE PagoAlquiler (
 )
 
 CREATE TABLE Inquilino (
-    persona_codigo numeric(18,0) NOT NULL,
-    alquiler_codigo numeric(18,0) NOT NULL,
-    PRIMARY KEY(persona_codigo,alquiler_codigo),
-    FOREIGN KEY (alquiler_codigo) REFERENCES Alquiler(alquiler_codigo),   
-    FOREIGN KEY (persona_codigo) REFERENCES Persona(persona_codigo)    
+    inquilino_persona numeric(18,0) NOT NULL,
+    inquilino_alquiler numeric(18,0) NOT NULL,
+    PRIMARY KEY(inquilino_persona,inquilino_alquiler),
+    FOREIGN KEY (inquilino_alquiler) REFERENCES Alquiler(alquiler_codigo),   
+    FOREIGN KEY (inquilino_persona) REFERENCES Persona(persona_codigo)    
 
 )
 
@@ -198,11 +198,11 @@ CREATE TABLE Venta (
 )
 
 CREATE TABLE Comprador (
-    persona_codigo numeric(18,0) NOT NULL,
-    venta_codigo numeric(18,0) NOT NULL,
-    PRIMARY KEY(persona_codigo,venta_codigo),
-    FOREIGN KEY (venta_codigo) REFERENCES Venta(venta_codigo),
-    FOREIGN KEY (persona_codigo) REFERENCES Persona(persona_codigo)  
+    comprador_persona numeric(18,0) NOT NULL,
+    comprador_venta numeric(18,0) NOT NULL,
+    PRIMARY KEY(comprador_persona,comprador_venta),
+    FOREIGN KEY (comprador_persona) REFERENCES Venta(venta_codigo),
+    FOREIGN KEY (comprador_venta) REFERENCES Persona(persona_codigo)  
 )
 
 
