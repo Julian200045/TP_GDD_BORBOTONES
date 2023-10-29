@@ -124,8 +124,6 @@ INSERT INTO agente (persona_codigo,sucursal_codigo)
 select distinct(persona_codigo),SUCURSAL_CODIGO from gd_esquema.Maestra
 join persona on persona_dni = agente_dni and persona_nombre = agente_nombre
 
-
-
 --INMUEBLE
 SET IDENTITY_INSERT inmueble on
 insert into inmueble (inmueble_codigo,inmueble_tipo, inmueble_barrio, inmueble_ambientes, inmueble_orientacion, inmueble_disposicion, inmueble_estado,
@@ -236,5 +234,9 @@ INSERT INTO Comprador (venta_codigo,persona_codigo)
 select distinct(m.venta_codigo),p.persona_codigo from Persona p 
 join gd_esquema.Maestra m on persona_dni = comprador_dni
 
+--IMPORTEPORPERIODOS
+insert into ImportePorPeriodos (ip_alquiler_codigo,ip_nroPeriodoInicio,ip_nroPeriodoFin,ip_precio)
+select distinct(alquiler_codigo),detalle_alq_nro_periodo_ini,detalle_alq_nro_periodo_fin,detalle_alq_precio from gd_esquema.Maestra
+where alquiler_codigo is not null and DETALLE_ALQ_NRO_PERIODO_FIN is not null and DETALLE_ALQ_NRO_PERIODO_INI is not null
 
 GO

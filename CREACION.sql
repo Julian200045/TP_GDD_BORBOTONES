@@ -158,13 +158,13 @@ CREATE TABLE Alquiler (
     alquiler_gastos_averiguaciones numeric(18,2)
 )
 
-CREATE TABLE ImporteXPeriodos (
-    alquiler_codigo numeric(18,0) NOT NULL,
-    importeXPeriodos_nroPeriodoInicio numeric(4,0) NOT NULL,
-    importeXPeriodos_nroPeriodoFin numeric(4,0) NOT NULL,
-    PRIMARY KEY(alquiler_codigo,importeXPeriodos_nroPeriodoInicio,importeXPeriodos_nroPeriodoFin),
-    FOREIGN KEY (alquiler_codigo) REFERENCES Alquiler(alquiler_codigo),
-    importeXPeriodos_precio numeric(18,2)
+CREATE TABLE ImportePorPeriodos (
+    ip_alquiler_codigo numeric(18,0) NOT NULL,
+    ip_nroPeriodoInicio numeric(4,0) NOT NULL,
+    ip_nroPeriodoFin numeric(4,0) NOT NULL,
+    PRIMARY KEY(ip_alquiler_codigo,ip_nroPeriodoInicio,ip_nroPeriodoFin),
+    FOREIGN KEY (ip_alquiler_codigo) REFERENCES Alquiler(alquiler_codigo),
+    ip_precio numeric(18,2)
 )
 
 CREATE TABLE PagoAlquiler (

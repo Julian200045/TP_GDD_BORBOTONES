@@ -14,7 +14,7 @@ DROP TABLE tipooperacion
 DROP TABLE anuncio
 DROP TABLE estadoalquiler
 DROP TABLE alquiler
-DROP TABLE importexperiodos
+DROP TABLE importeporperiodos
 DROP TABLE pagoalquiler
 DROP TABLE inquilino
 DROP TABLE venta
