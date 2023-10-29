@@ -189,7 +189,7 @@ CREATE TABLE Venta (
     venta_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     venta_moneda numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo) NOT NULL,
     venta_anuncio numeric(19,0) FOREIGN KEY REFERENCES Anuncio(anuncio_codigo) NOT NULL,
-    venta_feacha smalldatetime,
+    venta_fecha smalldatetime,
     venta_comision numeric(18,2),
     venta_precio numeric(18,2)
 )
@@ -205,11 +205,10 @@ CREATE TABLE Comprador (
 
 CREATE TABLE PagoVenta (
     pagoVenta_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    venta_codigo numeric(18,0) FOREIGN KEY REFERENCES Venta(venta_codigo),
-    moneda_codigo numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo),
-    medioDePago_codigo numeric(18,0) FOREIGN KEY REFERENCES MedioDePago(medioDePago_codigo),
+    pagoVenta_venta numeric(18,0) FOREIGN KEY REFERENCES Venta(venta_codigo),
+    pagoVenta_moneda numeric(18,0) FOREIGN KEY REFERENCES Moneda(moneda_codigo),
+    pagoVenta_medioDePago numeric(18,0) FOREIGN KEY REFERENCES MedioDePago(medioDePago_codigo),
     pagoVenta_importe numeric(18,2),
-    pagoVenta_cotizacion numeric(18,2),
-    pagoVenta_fecha smalldatetime
+    pagoVenta_cotizacion numeric(18,2)
 )
 

@@ -221,4 +221,25 @@ FROM gd_esquema.Maestra maestra
 JOIN MedioDePago mp on mp.medioDePago_detalle = maestra.PAGO_ALQUILER_MEDIO_PAGO
 
 SET IDENTITY_INSERT pagoAlquiler off
+
+--VENTA
+SET IDENTITY_INSERT venta on
+
+INSERT INTO Venta (venta_codigo, venta_moneda, venta_anuncio, venta_fecha, venta_comision, venta_precio)
+SELECT distinct(venta_codigo), moneda_codigo, anuncio_codigo, venta_fecha, venta_comision, venta_precio_venta 
+FROM gd_esquema.Maestra
+JOIN Moneda ON venta_moneda = moneda_detalle
+
+SET IDENTITY_INSERT venta off
+
+--PAGO VENTA
+
+INSERT INTO PagoVenta (pagoVenta_venta, pagoVenta_moneda, pagoVenta_medioDePago,
+                       pagoVenta_importe, pagoVenta_cotizacion)
+SELECT VENTA_CODIGO, mo.moneda_codigo, mp.medioDePago_codigo,
+       PAGO_VENTA_IMPORTE, PAGO_VENTA_COTIZACION
+FROM gd_esquema.Maestra maestra
+JOIN Moneda mo on mo.moneda_detalle = maestra.pago_venta_moneda
+JOIN MedioDePago mp on mp.medioDePago_detalle = maestra.pago_venta_medio_pago
+
 GO
