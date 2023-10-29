@@ -138,15 +138,6 @@ INSERT INTO agente (persona_codigo,sucursal_codigo)
 select distinct(persona_codigo),SUCURSAL_CODIGO from gd_esquema.Maestra
 join persona on persona_dni = agente_dni and persona_nombre = agente_nombre
 
---ALQUILER FALTA ANUNCIO ????????
---SET IDENTITY_INSERT alquiler on
---INSERT INTO Alquiler (alquiler_codigo, alquiler_anuncio_codigo, alquiler_estado, alquiler_fecha_inicio, alquiler_fecha_fin, 
-  --                    alquiler_cantidad_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averiguaciones)
---SELECT distinct(alquiler_codigo), anuncio_codigo, estado_alquiler_codigo, alquiler_fecha_inicio, alquiler_fecha_fin, 
- --       alquiler_cant_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averigua FROM gd_esquema.Maestra
---JOIN EstadoAlquiler ON estado_alquiler_detalle = alquiler_estado
---SET IDENTITY_INSERT alquiler off
-
 --INQUILINO
 -- No se puede hacer porque falta que alquiler sea primary key en otra tabla
 /*INSERT INTO Inquilino (persona_codigo,alquiler_codigo)
@@ -208,7 +199,26 @@ where INMUEBLE_CODIGO is not null
 
 SET IDENTITY_INSERT Anuncio off
 
+--ALQUILER 
+SET IDENTITY_INSERT alquiler on
 
---alamitad
+INSERT INTO Alquiler (alquiler_codigo, alquiler_anuncio_codigo, alquiler_estado, alquiler_fecha_inicio, alquiler_fecha_fin, 
+                      alquiler_cantidad_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averiguaciones)
+SELECT distinct(alquiler_codigo), anuncio_codigo, estado_alquiler_codigo, alquiler_fecha_inicio, alquiler_fecha_fin, 
+                alquiler_cant_periodos, alquiler_deposito, alquiler_comision, alquiler_gastos_averigua FROM gd_esquema.Maestra
+JOIN EstadoAlquiler ON estado_alquiler_detalle = alquiler_estado
 
+SET IDENTITY_INSERT alquiler off
+
+--PAGO ALQUILER
+SET IDENTITY_INSERT pagoAlquiler on
+
+INSERT INTO PagoAlquiler (pagoAlquiler_codigo, pagoAlquiler_alquiler, pagoAlquiler_medioDePago,
+                          pagoAlquiler_fechaPago, pagoAlquiler_nroPeriodo, pagoAlquiler_detallePeriodo, pagoAlquiler_fechaInicioPeriodo, pagoAlquiler_fechaFinPeriodo, pagoAlquiler_importe)
+SELECT DISTINCT(PAGO_ALQUILER_CODIGO), alquiler_codigo, mp.medioDePago_codigo,
+       PAGO_ALQUILER_FECHA, PAGO_ALQUILER_NRO_PERIODO, PAGO_ALQUILER_DESC, PAGO_ALQUILER_FEC_INI, PAGO_ALQUILER_FEC_FIN, PAGO_ALQUILER_IMPORTE
+FROM gd_esquema.Maestra maestra
+JOIN MedioDePago mp on mp.medioDePago_detalle = maestra.PAGO_ALQUILER_MEDIO_PAGO
+
+SET IDENTITY_INSERT pagoAlquiler off
 GO

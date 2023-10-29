@@ -166,10 +166,10 @@ CREATE TABLE ImporteXPeriodos (
 
 CREATE TABLE PagoAlquiler (
     pagoAlquiler_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
-    alquiler_codigo numeric(18,0) FOREIGN KEY REFERENCES Alquiler(alquiler_codigo),
-    medioDePago_codigo numeric(18,0) FOREIGN KEY REFERENCES MedioDePago(medioDePago_codigo),
+    pagoAlquiler_alquiler numeric(18,0) FOREIGN KEY REFERENCES Alquiler(alquiler_codigo),
+    pagoAlquiler_medioDePago numeric(18,0) FOREIGN KEY REFERENCES MedioDePago(medioDePago_codigo),
     pagoAlquiler_fechaPago smalldatetime,
-    pagoAlquiler_nroPedido numeric(4,0),
+    pagoAlquiler_nroPeriodo numeric(4,0),
     pagoAlquiler_detallePeriodo nvarchar(100),
     pagoAlquiler_fechaInicioPeriodo smalldatetime,
     pagoAlquiler_fechaFinPeriodo smalldatetime,
