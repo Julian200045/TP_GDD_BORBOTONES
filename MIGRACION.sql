@@ -78,16 +78,16 @@ INSERT INTO EstadoAnuncio (estadoAnuncio_Detalle) values ('Vigente')
 
 --PERSONA
 INSERT INTO Persona (persona_dni, persona_nombre, persona_apellido, persona_fecha_registro, persona_telefono, persona_mail, persona_fecha_nacimiento)
-SELECT inquilino_dni, inquilino_nombre, inquilino_apellido, inquilino_fecha_registro, inquilino_telefono, inquilino_mail, inquilino_fecha_nac FROM gd_esquema.Maestra
+SELECT DISTINCT(inquilino_dni), inquilino_nombre, inquilino_apellido, inquilino_fecha_registro, inquilino_telefono, inquilino_mail, inquilino_fecha_nac FROM gd_esquema.Maestra m
 WHERE inquilino_dni IS NOT NULL
 UNION
-SELECT propietario_dni, propietario_nombre, propietario_apellido, propietario_fecha_registro, propietario_telefono, propietario_mail, propietario_fecha_nac FROM gd_esquema.Maestra
+SELECT DISTINCT(propietario_dni), propietario_nombre, propietario_apellido, propietario_fecha_registro, propietario_telefono, propietario_mail, propietario_fecha_nac FROM gd_esquema.Maestra
 WHERE propietario_dni IS NOT NULL
 UNION
-SELECT comprador_dni, comprador_nombre, comprador_apellido,comprador_fecha_registro, comprador_telefono,comprador_mail, comprador_fecha_nac FROM gd_esquema.Maestra
+SELECT DISTINCT(comprador_dni), comprador_nombre, comprador_apellido,comprador_fecha_registro, comprador_telefono,comprador_mail, comprador_fecha_nac FROM gd_esquema.Maestra
 WHERE comprador_dni IS NOT NULL
 UNION
-SELECT agente_dni, agente_nombre, agente_apellido, agente_fecha_registro, agente_telefono, agente_mail, agente_fecha_nac FROM gd_esquema.Maestra
+SELECT  DISTINCT(agente_dni), agente_nombre, agente_apellido, agente_fecha_registro, agente_telefono, agente_mail, agente_fecha_nac FROM gd_esquema.Maestra
 WHERE agente_dni IS NOT NULL
 
 --PROVINCIA
@@ -228,13 +228,15 @@ JOIN MedioDePago mp on mp.medioDePago_detalle = maestra.pago_venta_medio_pago
 
 --INQUILINO
 INSERT INTO Inquilino (inquilino_alquiler,inquilino_persona)
-select distinct(m.alquiler_codigo),p.persona_codigo from Persona p 
+select distinct(m.alquiler_codigo),p.persona_codigo 
+from Persona p 
 join gd_esquema.Maestra m on persona_dni = inquilino_dni 
 
 --COMPRADOR
 INSERT INTO Comprador (comprador_venta,comprador_persona)
-select distinct(m.venta_codigo),p.persona_codigo from Persona p 
-join gd_esquema.Maestra m on persona_dni = comprador_dni
+select distinct venta_codigo ,p.persona_codigo 
+from gd_esquema.Maestra maestra
+join Persona p on (p.persona_dni = maestra.comprador_dni and p.persona_apellido = maestra.COMPRADOR_apellido)
 
 --IMPORTEPORPERIODOS
 insert into ImportePorPeriodos (ip_alquiler_codigo,ip_nroPeriodoInicio,ip_nroPeriodoFin,ip_precio)
@@ -242,5 +244,3 @@ select distinct(alquiler_codigo),detalle_alq_nro_periodo_ini,detalle_alq_nro_per
 where alquiler_codigo is not null and DETALLE_ALQ_NRO_PERIODO_FIN is not null and DETALLE_ALQ_NRO_PERIODO_INI is not null
 
 GO
-
-exec migracionDatos

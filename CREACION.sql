@@ -198,13 +198,12 @@ CREATE TABLE Venta (
 )
 
 CREATE TABLE Comprador (
-    comprador_persona numeric(18,0) NOT NULL,
     comprador_venta numeric(18,0) NOT NULL,
+	comprador_persona numeric(18,0) NOT NULL,
     PRIMARY KEY(comprador_persona,comprador_venta),
-    FOREIGN KEY (comprador_persona) REFERENCES Venta(venta_codigo),
-    FOREIGN KEY (comprador_venta) REFERENCES Persona(persona_codigo)  
+    FOREIGN KEY (comprador_persona) REFERENCES Persona(persona_codigo),
+    FOREIGN KEY (comprador_venta) REFERENCES Venta(venta_codigo)
 )
-
 
 CREATE TABLE PagoVenta (
     pagoVenta_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -214,4 +213,3 @@ CREATE TABLE PagoVenta (
     pagoVenta_importe numeric(18,2),
     pagoVenta_cotizacion numeric(18,2)
 )
-
