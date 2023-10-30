@@ -1,27 +1,35 @@
+-------------------INICIO SCRIPT script_creacion_inicial.sql-------------------
+
+--USAR DATABASE GD2C2023
 USE GD2C2023
 GO
+--CREAR ESQUEMA BORBOTONES
 CREATE SCHEMA borbotones
 GO
+
+-------------------------------CREACION-----------------------------------------
+
+--CREAR PROCEDIMIENTO DE CREACION DE DATOS (TABLAS CON SUS RESPECTIVAS PK,FK)
 CREATE PROCEDURE borbotones.creacionDatos
 AS
-
+--CREAR PROVINCIA
 CREATE TABLE borbotones.Provincia (
     provincia_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     provincia_detalle nvarchar(50)
 )
-
+--CREAR LOCALIDAD
 CREATE TABLE borbotones.Localidad (
     localidad_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     localidad_provincia numeric(18,0) FOREIGN KEY REFERENCES borbotones.Provincia(provincia_codigo),
     localidad_detalle nvarchar(50)
 )
-
+--CREAR BARRIO
 CREATE TABLE borbotones.Barrio (
     barrio_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     barrio_localidad numeric(18,0) FOREIGN KEY REFERENCES borbotones.Localidad(localidad_codigo),
     barrio_detalle nvarchar(50)
 )
-
+--CREAR SUCURSAL
 CREATE TABLE borbotones.Sucursal (
     sucursal_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     sucursal_localidad numeric(18,0) FOREIGN KEY REFERENCES borbotones.Localidad(localidad_codigo),
@@ -29,37 +37,37 @@ CREATE TABLE borbotones.Sucursal (
     sucursal_direccion nvarchar(50),
     sucursal_telefono nvarchar(50)
 )
-
+--CREAR TIPOINMUEBLE
 CREATE TABLE borbotones.TipoInmueble (
     tipo_inmueble_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     tipo_inmueble_detalle nvarchar(100)
 )
-
+--CREAR ESTADOINMUEBLE
 CREATE TABLE borbotones.EstadoInmueble (
     estado_inmueble_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     estado_inmueble_detalle nvarchar(50)
 )
-
+--CREAR AMBIENTES
 CREATE TABLE borbotones.Ambientes (
     ambientes_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     ambientes_detalle nvarchar(50)
 )
-
+--CREAR DISPOSICION
 CREATE TABLE borbotones.Disposicion (
     disposicion_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     disposicion_detalle nvarchar(50)
 )
-
+--CREAR ORIENTACION
 CREATE TABLE borbotones.Orientacion (
     orientacion_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     orientacion_detalle nvarchar(50)
 )
-
+--CREAR CARACTERISTICA
 CREATE TABLE borbotones.Caracteristica (
     caracteristica_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     caracteristica_detalle nvarchar(50)
 )
-
+--CREAR INMUEBLE
 CREATE TABLE borbotones.Inmueble (
 	inmueble_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     inmueble_tipo numeric(18,0) FOREIGN KEY REFERENCES borbotones.TipoInmueble(tipo_inmueble_codigo) NOT NULL,
@@ -75,7 +83,7 @@ CREATE TABLE borbotones.Inmueble (
     inmueble_antiguedad numeric(4,0),
     inmueble_expensas numeric(18,2)
 )
-
+--CREAR CARACXINMUEBLE
 CREATE TABLE borbotones.CaracteristicaPorInmueble (
     caracInmueble_caracteristica numeric(18,0) NOT NULL,
 	caracInmueble_inmueble numeric(18,0) NOT NULL,
@@ -83,7 +91,7 @@ CREATE TABLE borbotones.CaracteristicaPorInmueble (
 	FOREIGN KEY (caracInmueble_caracteristica) REFERENCES borbotones.Caracteristica(caracteristica_codigo),
     FOREIGN KEY (caracInmueble_inmueble) REFERENCES borbotones.Inmueble(inmueble_codigo)
 )
-
+--CREAR PERSONA
 CREATE TABLE borbotones.Persona (
     persona_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     persona_nombre nvarchar(50),
@@ -94,13 +102,13 @@ CREATE TABLE borbotones.Persona (
     persona_mail nvarchar(100),
     persona_fecha_nacimiento smalldatetime
 )
-
+--CREAR AGENTE
 CREATE TABLE borbotones.Agente (
     agente_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     agente_persona numeric(18,0) FOREIGN KEY REFERENCES borbotones.Persona(persona_codigo),
     agente_sucursal numeric(18,0) FOREIGN KEY REFERENCES borbotones.Sucursal(sucursal_codigo)
 )
-
+--CREAR PROPIETARIO
 CREATE TABLE borbotones.Propietario (
     propietario_persona numeric(18,0) NOT NULL,
     propietario_inmueble numeric(18,0) NOT NULL,
@@ -108,32 +116,32 @@ CREATE TABLE borbotones.Propietario (
     FOREIGN KEY (propietario_persona) REFERENCES borbotones.Persona(persona_codigo),
     FOREIGN KEY (propietario_inmueble) REFERENCES borbotones.Inmueble(inmueble_codigo)
 )
-
+--CREAR MONEDA
 CREATE TABLE borbotones.Moneda (
     moneda_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     moneda_detalle nvarchar(100)
 )
-
+--CREAR MEDIODEPAGO
 CREATE TABLE borbotones.MedioDePago (
     medioDePago_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     medioDePago_detalle nvarchar(50)
 )
-
+--CREAR TIPOSPERIODOSANUNCIO
 CREATE TABLE borbotones.TiposPeriodosAnuncio (
     tipoPeriodo_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     tipoPeriodo_detalle nvarchar(100)
 )
-
+--CREAR ESTADOANUNCIO
 CREATE TABLE borbotones.EstadoAnuncio (
     estadoAnuncio_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     estadoAnuncio_Detalle nvarchar(100)
 )
-
+--CREAR TIPO OPERACION
 CREATE TABLE borbotones.TipoOperacion (
     tipoOperacion_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     tipoOperacion_detalle nvarchar(100)
 )
-
+--CREAR ANUNCIO
 CREATE TABLE borbotones.Anuncio (
     anuncio_codigo numeric(19,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     anuncio_tipoOperacion numeric(18,0) FOREIGN KEY REFERENCES borbotones.TipoOperacion(tipoOperacion_codigo),
@@ -147,12 +155,12 @@ CREATE TABLE borbotones.Anuncio (
     anuncio_costoAnuncio numeric(18,2),
     anuncio_fechaFinalizacion smalldatetime
 )
-
+--CREAR ESTADOALQUILER
 CREATE TABLE borbotones.EstadoAlquiler (
     estado_alquiler_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     estado_alquiler_detalle nvarchar(50)
 )
-
+--CREAR ALQUILER
 CREATE TABLE borbotones.Alquiler (
     alquiler_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     alquiler_anuncio_codigo numeric(19,0) FOREIGN KEY REFERENCES borbotones.Anuncio(anuncio_codigo),
@@ -164,7 +172,7 @@ CREATE TABLE borbotones.Alquiler (
     alquiler_comision numeric(18,0),
     alquiler_gastos_averiguaciones numeric(18,2)
 )
-
+--CREAR IMPORTEPORPERIODOS
 CREATE TABLE borbotones.ImportePorPeriodos (
     ip_alquiler_codigo numeric(18,0) NOT NULL,
     ip_nroPeriodoInicio numeric(4,0) NOT NULL,
@@ -173,7 +181,7 @@ CREATE TABLE borbotones.ImportePorPeriodos (
     FOREIGN KEY (ip_alquiler_codigo) REFERENCES borbotones.Alquiler(alquiler_codigo),
     ip_precio numeric(18,2)
 )
-
+--CREAR PAGOALQUILER
 CREATE TABLE borbotones.PagoAlquiler (
     pagoAlquiler_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     pagoAlquiler_alquiler numeric(18,0) FOREIGN KEY REFERENCES borbotones.Alquiler(alquiler_codigo),
@@ -185,7 +193,7 @@ CREATE TABLE borbotones.PagoAlquiler (
     pagoAlquiler_fechaFinPeriodo smalldatetime,
     pagoAlquiler_importe numeric(18,2)
 )
-
+--CREAR INQUILINO
 CREATE TABLE borbotones.Inquilino (
     inquilino_persona numeric(18,0) NOT NULL,
     inquilino_alquiler numeric(18,0) NOT NULL,
@@ -194,7 +202,7 @@ CREATE TABLE borbotones.Inquilino (
     FOREIGN KEY (inquilino_persona) REFERENCES borbotones.Persona(persona_codigo)    
 
 )
-
+--CREAR VENTA
 CREATE TABLE borbotones.Venta (
     venta_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     venta_moneda numeric(18,0) FOREIGN KEY REFERENCES borbotones.Moneda(moneda_codigo) NOT NULL,
@@ -203,7 +211,7 @@ CREATE TABLE borbotones.Venta (
     venta_comision numeric(18,2),
     venta_precio numeric(18,2)
 )
-
+--CREAR COMPRADOR
 CREATE TABLE borbotones.Comprador (
     comprador_venta numeric(18,0) NOT NULL,
 	comprador_persona numeric(18,0) NOT NULL,
@@ -211,7 +219,7 @@ CREATE TABLE borbotones.Comprador (
     FOREIGN KEY (comprador_persona) REFERENCES borbotones.Persona(persona_codigo),
     FOREIGN KEY (comprador_venta) REFERENCES borbotones.Venta(venta_codigo)
 )
-
+--CREAR PAGOVENTA
 CREATE TABLE borbotones.PagoVenta (
     pagoVenta_codigo numeric(18,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
     pagoVenta_venta numeric(18,0) FOREIGN KEY REFERENCES borbotones.Venta(venta_codigo),
@@ -222,13 +230,13 @@ CREATE TABLE borbotones.PagoVenta (
 )
 
 GO
+-------------------------------MIGRACION-----------------------------------------
 
-----------------------------------
-
+--CREAR PROCEDIMIENTO DE MIGRACION DE DATOS (COMPLETAR EL NUEVO MODELO)
 CREATE PROCEDURE borbotones.migracionDatos
 AS
 
---TIPOINMUEBLE
+--MIGRAR TIPOINMUEBLE
 INSERT INTO borbotones.TipoInmueble (tipo_inmueble_detalle)
 SELECT distinct(INMUEBLE_TIPO_INMUEBLE) FROM gd_esquema.Maestra
 WHERE INMUEBLE_TIPO_INMUEBLE IS NOT NULL
@@ -236,33 +244,33 @@ INSERT INTO borbotones.TipoInmueble (tipo_inmueble_detalle)
 values ('Casa'),
        ('PH')
 
---AMBIENTES
+--MIGRAR AMBIENTES
 INSERT INTO borbotones.Ambientes (ambientes_detalle)
 SELECT distinct(INMUEBLE_CANT_AMBIENTES) FROM gd_esquema.Maestra
 WHERE INMUEBLE_CANT_AMBIENTES IS NOT NULL
 
---ORIENTACION
+--MIGRAR ORIENTACION
 INSERT INTO borbotones.Orientacion (orientacion_detalle)
 SELECT distinct(INMUEBLE_ORIENTACION)  FROM gd_esquema.Maestra
 WHERE INMUEBLE_ORIENTACION IS NOT NULL
 
---DISPOSICION
+--MIGRAR DISPOSICION
 INSERT INTO borbotones.Disposicion (disposicion_detalle)
 SELECT distinct(INMUEBLE_DISPOSICION)  FROM gd_esquema.Maestra
 WHERE INMUEBLE_DISPOSICION IS NOT NULL
 
---ESTADOINMUEBLE
+--MIGRAR ESTADOINMUEBLE
 INSERT INTO borbotones.EstadoInmueble (estado_inmueble_detalle)
 SELECT distinct(INMUEBLE_ESTADO)  FROM gd_esquema.Maestra
 WHERE INMUEBLE_ESTADO IS NOT NULL
 INSERT INTO EstadoInmueble (estado_inmueble_detalle) values('Regular')
 
---TIPOOPERACION
+-- MIGRAR TIPOOPERACION
 INSERT INTO borbotones.TipoOperacion (tipoOperacion_detalle)
 SELECT distinct(ANUNCIO_TIPO_OPERACION) FROM gd_esquema.Maestra
 WHERE ANUNCIO_TIPO_OPERACION IS NOT NULL
 
---CARACTERISTICA
+--MIGRAR CARACTERISTICA
 INSERT INTO borbotones.Caracteristica (caracteristica_detalle) 
 values ('Calefaccion'),
        ('WIFI'),
@@ -272,7 +280,7 @@ values ('Calefaccion'),
        ('Aire acondicionado'),
        ('Amoblamiento')
 
---MEDIODEPAGO
+--MIGRAR MEDIODEPAGO
 INSERT INTO borbotones.MedioDePago (medioDePago_Detalle)
 SELECT distinct(PAGO_ALQUILER_MEDIO_PAGO) FROM gd_esquema.Maestra
 WHERE PAGO_ALQUILER_MEDIO_PAGO IS NOT NULL
@@ -280,12 +288,12 @@ INSERT INTO MedioDePago (medioDePago_Detalle)
 values ('Crédito'),
        ('Débito')
 
---MONEDA
+--MIGRAR MONEDA
 INSERT INTO borbotones.Moneda (moneda_detalle)
 SELECT DISTINCT ANUNCIO_MONEDA FROM gd_esquema.Maestra
 WHERE ANUNCIO_MONEDA IS NOT NULL
 
---ESTADOALQUILER
+--MIGRAR ESTADOALQUILER
 INSERT INTO borbotones.EstadoAlquiler (estado_alquiler_detalle)
 SELECT distinct(ALQUILER_ESTADO) FROM gd_esquema.Maestra
 WHERE ALQUILER_ESTADO IS NOT NULL
@@ -293,18 +301,18 @@ INSERT INTO EstadoAlquiler (estado_alquiler_detalle)
 values ('Vigente'),
        ('Cancelado')
 
---TIPOSPERIODOSANUNCIO
+--MIGRAR TIPOSPERIODOSANUNCIO
 INSERT INTO borbotones.TiposPeriodosAnuncio (tipoPeriodo_detalle)
 SELECT distinct ANUNCIO_TIPO_PERIODO FROM gd_esquema.Maestra
 WHERE ANUNCIO_TIPO_PERIODO IS NOT NULL
 
---ESTADOANUNCIO
+--MIGRAR ESTADOANUNCIO
 INSERT INTO borbotones.EstadoAnuncio (estadoAnuncio_Detalle)
 SELECT distinct(anuncio_estado) FROM gd_esquema.Maestra
 WHERE anuncio_estado IS NOT NULL
 INSERT INTO EstadoAnuncio (estadoAnuncio_Detalle) values ('Vigente')
 
---PERSONA
+--MIGRAR PERSONA
 INSERT INTO borbotones.Persona (persona_dni, persona_nombre, persona_apellido, persona_fecha_registro, persona_telefono, persona_mail, persona_fecha_nacimiento)
 SELECT DISTINCT(inquilino_dni), inquilino_nombre, inquilino_apellido, inquilino_fecha_registro, inquilino_telefono, inquilino_mail, inquilino_fecha_nac FROM gd_esquema.Maestra m
 WHERE inquilino_dni IS NOT NULL
@@ -318,12 +326,12 @@ UNION
 SELECT  DISTINCT(agente_dni), agente_nombre, agente_apellido, agente_fecha_registro, agente_telefono, agente_mail, agente_fecha_nac FROM gd_esquema.Maestra
 WHERE agente_dni IS NOT NULL
 
---PROVINCIA
+--MIGRAR PROVINCIA
 INSERT INTO borbotones.Provincia (provincia_detalle)
 SELECT distinct(INMUEBLE_PROVINCIA) FROM gd_esquema.Maestra
 WHERE INMUEBLE_PROVINCIA IS NOT NULL
 
---LOCALIDAD
+--MIGRAR LOCALIDAD
 INSERT INTO borbotones.Localidad (localidad_detalle, localidad_provincia)
 SELECT distinct(inmueble_localidad), provincia_codigo FROM gd_esquema.Maestra
 JOIN borbotones.Provincia ON inmueble_provincia = provincia_detalle
@@ -333,13 +341,13 @@ SELECT distinct(sucursal_localidad), provincia_codigo FROM gd_esquema.Maestra
 JOIN borbotones.Provincia ON sucursal_provincia = provincia_detalle
 WHERE sucursal_localidad IS NOT NULL
 
---BARRIO
+--MIGRAR BARRIO
 INSERT INTO Barrio (barrio_detalle, barrio_localidad)
 SELECT distinct(inmueble_barrio), localidad_codigo FROM gd_esquema.Maestra
 JOIN borbotones.Localidad ON inmueble_localidad = localidad_detalle
 WHERE inmueble_barrio IS NOT NULL
 
---SUCURSAL
+--MIGRAR SUCURSAL
 SET IDENTITY_INSERT borbotones.sucursal on
 INSERT INTO borbotones.Sucursal (sucursal_codigo, sucursal_localidad, sucursal_detalle, sucursal_direccion, sucursal_telefono)
 SELECT distinct(sucursal_codigo), localidad_codigo, sucursal_nombre, sucursal_direccion, sucursal_telefono FROM gd_esquema.Maestra
@@ -347,12 +355,12 @@ JOIN borbotones.Localidad ON localidad_detalle = sucursal_localidad AND localida
 WHERE sucursal_localidad IS NOT NULL
 SET IDENTITY_INSERT borbotones.sucursal off
 
---AGENTE
+--MIGRAR AGENTE
 INSERT INTO borbotones.agente (agente_persona,agente_sucursal)
 select distinct(persona_codigo),SUCURSAL_CODIGO from gd_esquema.Maestra
 join borbotones.persona on persona_dni = agente_dni and persona_nombre = agente_nombre
 
---INMUEBLE
+--MIGRAR INMUEBLE
 SET IDENTITY_INSERT borbotones.inmueble on
 insert into borbotones.inmueble (inmueble_codigo,inmueble_tipo, inmueble_barrio, inmueble_ambientes, inmueble_orientacion, inmueble_disposicion, inmueble_estado,
 				inmueble_nombre, inmueble_descripcion, inmueble_direccion, inmueble_superficie, inmueble_antiguedad, inmueble_expensas)
@@ -375,7 +383,7 @@ where inmueble_codigo is not null
 
 SET IDENTITY_INSERT borbotones.inmueble off
 
---CARACTERISTICA POR INMUEBLE
+--MIGRAR CARACTERISTICA POR INMUEBLE
 insert into borbotones.caracteristicaporinmueble (caracInmueble_inmueble,caracInmueble_caracteristica)
 select distinct(inmueble_codigo),caracteristica_codigo from gd_esquema.MAestra
 join borbotones.Caracteristica on (INMUEBLE_CARACTERISTICA_CABLE = 1 and caracteristica_detalle = 'Cable')
@@ -389,12 +397,12 @@ union
 select distinct(inmueble_codigo),caracteristica_codigo from gd_esquema.MAestra
 join borbotones.Caracteristica on (INMUEBLE_CARACTERISTICA_GAS = 1 and caracteristica_detalle = 'Gas')
 
---PROPIETARIO
+--MIGRAR PROPIETARIO
 INSERT INTO borbotones.Propietario (propietario_persona,propietario_inmueble)
 select distinct(p.persona_codigo), m.inmueble_codigo from borbotones.Persona p 
 join gd_esquema.Maestra m on persona_dni = propietario_dni
 
---ANUNCIO
+--MIGRAR ANUNCIO
 SET IDENTITY_INSERT borbotones.Anuncio on 
 
 INSERT INTO Anuncio(anuncio_codigo, anuncio_tipoOperacion,anuncio_moneda,anuncio_inmueble,anuncio_agente,anuncio_estadoAnuncio,anuncio_tipoPeriodo,
@@ -412,7 +420,7 @@ where INMUEBLE_CODIGO is not null
 
 SET IDENTITY_INSERT borbotones.Anuncio off
 
---ALQUILER 
+--MIGRAR ALQUILER 
 SET IDENTITY_INSERT borbotones.alquiler on
 
 INSERT INTO borbotones.Alquiler (alquiler_codigo, alquiler_anuncio_codigo, alquiler_estado, alquiler_fecha_inicio, alquiler_fecha_fin, 
@@ -423,7 +431,7 @@ JOIN borbotones.EstadoAlquiler ON estado_alquiler_detalle = alquiler_estado
 
 SET IDENTITY_INSERT borbotones.alquiler off
 
---PAGO ALQUILER
+--MIGRAR PAGO ALQUILER
 SET IDENTITY_INSERT borbotones.pagoAlquiler on
 
 INSERT INTO borbotones.PagoAlquiler (pagoAlquiler_codigo, pagoAlquiler_alquiler, pagoAlquiler_medioDePago,
@@ -435,7 +443,7 @@ JOIN borbotones.MedioDePago mp on mp.medioDePago_detalle = maestra.PAGO_ALQUILER
 
 SET IDENTITY_INSERT borbotones.pagoAlquiler off
 
---VENTA
+--MIGRAR VENTA
 SET IDENTITY_INSERT borbotones.venta on
 
 INSERT INTO borbotones.Venta (venta_codigo, venta_moneda, venta_anuncio, venta_fecha, venta_comision, venta_precio)
@@ -445,7 +453,7 @@ JOIN borbotones.Moneda ON venta_moneda = moneda_detalle
 
 SET IDENTITY_INSERT borbotones.venta off
 
---PAGO VENTA
+--MIGRAR PAGO VENTA
 INSERT INTO borbotones.PagoVenta (pagoVenta_venta, pagoVenta_moneda, pagoVenta_medioDePago,
                        pagoVenta_importe, pagoVenta_cotizacion)
 SELECT VENTA_CODIGO, mo.moneda_codigo, mp.medioDePago_codigo,
@@ -454,24 +462,27 @@ FROM gd_esquema.Maestra maestra
 JOIN borbotones.Moneda mo on mo.moneda_detalle = maestra.pago_venta_moneda
 JOIN borbotones.MedioDePago mp on mp.medioDePago_detalle = maestra.pago_venta_medio_pago
 
---INQUILINO
+--MIGRAR INQUILINO
 INSERT INTO borbotones.Inquilino (inquilino_alquiler,inquilino_persona)
 select distinct(m.alquiler_codigo),p.persona_codigo 
 from borbotones.Persona p 
 join gd_esquema.Maestra m on persona_dni = inquilino_dni 
 
---COMPRADOR
+--MIGRAR COMPRADOR
 INSERT INTO borbotones.Comprador (comprador_venta,comprador_persona)
 select distinct venta_codigo ,p.persona_codigo 
 from gd_esquema.Maestra maestra
 join borbotones.Persona p on (p.persona_dni = maestra.comprador_dni and p.persona_apellido = maestra.COMPRADOR_apellido)
 
---IMPORTEPORPERIODOS
+--MIGRAR IMPORTEPORPERIODOS
 insert into borbotones.ImportePorPeriodos (ip_alquiler_codigo,ip_nroPeriodoInicio,ip_nroPeriodoFin,ip_precio)
 select distinct(alquiler_codigo),detalle_alq_nro_periodo_ini,detalle_alq_nro_periodo_fin,detalle_alq_precio from gd_esquema.Maestra
 where alquiler_codigo is not null and DETALLE_ALQ_NRO_PERIODO_FIN is not null and DETALLE_ALQ_NRO_PERIODO_INI is not null
 
 GO
 
+--EJECUTAR AMBOS PROCEDIMIENTOS (CREACION-MIGRACION)
 exec borbotones.creacionDatos
 exec borbotones.migracionDatos
+
+-------------FIN SCRIPT script_creacion_inicial.sql----------------
