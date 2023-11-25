@@ -68,17 +68,33 @@ CREATE TABLE BI_Moneda (
 
 --TABLAS DE HECHOS
 CREATE TABLE Anuncio(
-    
+    anuncio_codigo numeric(19,0) IDENTITY(1,1) PRIMARY KEY NOT NULL,
+    anuncio_tipoOperacion numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_TipoOperacion(tipoOperacion_codigo),--pk,fk
+    anuncio_moneda numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_Moneda(moneda_codigo), --tabla
+    anuncio_inmueble numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.Inmueble(inmueble_codigo), 
+    anuncio_agente numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.Agente(agente_codigo), 
+    anuncio_estadoAnuncio numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.EstadoAnuncio(estadoAnuncio_codigo),
+    anuncio_tipoPeriodo numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.TiposPeriodosAnuncio(tipoPeriodo_codigo),
+    anuncio_fechaPublicacion smalldatetime,
+    anuncio_precioPublicado numeric(18,2),
+    anuncio_costoAnuncio numeric(18,2),
+    anuncio_fechaFinalizacion smalldatetime
 )
+
+/*Duración promedio (en días) que se encuentran publicados los anuncios
+según el tipo de operación (alquiler, venta, etc), barrio y ambientes para cada
+cuatrimestre de cada año. Se consideran todos los anuncios que se dieron de alta
+en ese cuatrimestre. La duración se calcula teniendo en cuenta la fecha de alta y
+la fecha de finalización.*/
 
 CREATE TABLE Alquiler(
 
 )
 
 CREATE TABLE Ventas(
-
-)
-
+    
+)   
+    
 END
 GO
 
