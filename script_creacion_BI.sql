@@ -76,6 +76,7 @@ BEGIN
 
 	--CREACION TABLA DE HECHOS DE LOS ANUNCIOS
 	CREATE TABLE LOS_BORBOTONES.BI_TH_Anuncio(
+		anuncio_codigo numeric(19,0) IDENTITY(1,1),
 		anuncio_tipoOperacion numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_TipoOperacion(tipoOperacion_codigo),
 		anuncio_moneda numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Moneda(moneda_codigo), 
 		anuncio_ambientes numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Ambientes(ambientes_codigo), 
@@ -90,7 +91,7 @@ BEGIN
 		anuncio_precioPromedio numeric(18,2),
 		anuncio_duracion_en_dias numeric(18,0), --despues le harias el average este no seria foreign key
 		
-		PRIMARY KEY(anuncio_tipoOperacion, anuncio_moneda, anuncio_ambientes,anuncio_tipo_inmueble,
+		PRIMARY KEY(anuncio_codigo,anuncio_tipoOperacion, anuncio_moneda, anuncio_ambientes,anuncio_tipo_inmueble,
 		anuncio_rango_metros_cuadrados,anuncio_anio_publicacion,anuncio_cuatrimestre_publicacion,
 		anuncio_mes_publicacion,anuncio_barrio,anuncio_sucursal)    
 		
@@ -277,28 +278,28 @@ BEGIN
 
 	--MIGRACIÓN BI_TH_anuncio
 	insert into LOS_BORBOTONES.BI_TH_Anuncio
-		(anuncio_tipoOperacion,
+		(anuncio_anio_publicacion ,
+		anuncio_cuatrimestre_publicacion ,
+		anuncio_mes_publicacion ,
+		anuncio_tipoOperacion,
 		anuncio_moneda ,
 		anuncio_ambientes ,
 		anuncio_tipo_inmueble ,
 		anuncio_rango_metros_cuadrados ,
-		anuncio_anio_publicacion ,
-		anuncio_cuatrimestre_publicacion ,
-		anuncio_mes_publicacion ,
 		anuncio_barrio ,
 		anuncio_precioPromedio, 
 		anuncio_duracion_en_dias ,
 		anuncio_rango_etario_agente, 
 		anuncio_sucursal)
 	select 
+		year(a.anuncio_fechaPublicacion) as 'Anio de inicio',
+		LOS_BORBOTONES.Cuatrimestre(a.anuncio_fechaPublicacion) as 'Cuatrimestre de inicio',
+		month(a.anuncio_fechaPublicacion) as 'Mes de inicio',
 		a.anuncio_tipoOperacion as 'Tipo operacion', 
 		a.anuncio_moneda as 'Tipo moneda',
 		inmueble_ambientes as 'Cantidad de ambientes',
 		inmueble_tipo as 'Tipo de inmueble',
 		LOS_BORBOTONES.ObtenerRangoM2(inmueble_superficie) as 'Rango M2',
-		year(a.anuncio_fechaPublicacion) as 'Anio de inicio',
-		LOS_BORBOTONES.Cuatrimestre(a.anuncio_fechaPublicacion) as 'Cuatrimestre de inicio',
-		month(a.anuncio_fechaPublicacion) as 'Mes de inicio',
 		inmueble_barrio,
 		avg(a.anuncio_precioPublicado) as 'Precio promedio',
 		AVG(DATEDIFF(DAY, a.anuncio_fechaPublicacion, a.anuncio_fechaFinalizacion)) as 'Cant dias publicacion-finalizacion',
@@ -315,12 +316,11 @@ BEGIN
 		LOS_BORBOTONES.Cuatrimestre(a.anuncio_fechaPublicacion) ,
 		month(a.anuncio_fechaPublicacion),
         inmueble_barrio,
-        agente_sucursal,
+		agente_sucursal,
 		LOS_BORBOTONES.ObtenerRangoEtario(persona_fecha_nacimiento),
 		inmueble_tipo,
         inmueble_ambientes,
         LOS_BORBOTONES.ObtenerRangoM2(inmueble_superficie),
-        inmueble_codigo,
 		anuncio_tipoOperacion,
         anuncio_moneda;
 END
@@ -338,9 +338,9 @@ AS
 	SELECT 
 		a.anuncio_anio_publicacion as 'Año publicacion anuncio',
 		a.anuncio_cuatrimestre_publicacion as 'Cuatrimestre publicacion anuncio',
-		bar.barrio_detalle as 'Barrio donde se publico el anuncio',
-		ambi.ambientes_detalle 'Ambientes',
 		tipoOp.tipoOperacion_detalle 'Tipo Operacion',
+		ambi.ambientes_detalle 'Ambientes',
+		bar.barrio_detalle as 'Barrio donde se publico el anuncio',
 		avg(anuncio_duracion_en_dias) AS 'Duracion promedio en dias'
 	FROM
 		LOS_BORBOTONES.BI_TH_Anuncio a
@@ -354,6 +354,35 @@ AS
 		ambi.ambientes_detalle,
 		tipoOp.tipoOperacion_detalle
 GO
+
+CREATE VIEW LOS_BORBOTONES.VistaPrecioPromedioAnuncios
+AS
+SELECT 
+    anuncio_anio_publicacion as 'Año publicacion anuncio',
+	anuncio_cuatrimestre_publicacion as 'Cuatrimestre publicacion anuncio',
+    tipoOperacion_detalle as 'Tipo Operacion',
+    tipo_inmueble_detalle AS 'Tipo Inmueble',
+    rangoM2_Inicio AS 'Rango Inicio',
+    rangoM2_Fin AS 'Rango Fin',
+    moneda_detalle AS 'Moneda Detalle',
+    AVG(anuncio_precioPromedio) AS 'Precio promedio'
+FROM
+    LOS_BORBOTONES.BI_TH_Anuncio 
+    JOIN LOS_BORBOTONES.BI_D_TipoOperacion ON anuncio_tipoOperacion = tipoOperacion_codigo
+    JOIN LOS_BORBOTONES.BI_D_TipoInmueble ON anuncio_tipo_inmueble = tipo_inmueble_codigo 
+    JOIN LOS_BORBOTONES.BI_D_RangoM2 ON anuncio_rango_metros_cuadrados = rangoM2_codigo
+    JOIN LOS_BORBOTONES.BI_D_Moneda ON anuncio_moneda = moneda_codigo 
+GROUP BY
+    anuncio_anio_publicacion,
+    anuncio_cuatrimestre_publicacion,
+    tipoOperacion_detalle,
+    tipo_inmueble_detalle,
+    rangoM2_Inicio,
+    rangoM2_Fin,
+    moneda_detalle
+GO
+
+
 
 
 
