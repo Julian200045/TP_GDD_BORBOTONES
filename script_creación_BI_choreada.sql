@@ -67,7 +67,7 @@ CREATE TABLE ANDY_Y_SUS_SEMINARAS.BI_hecho_anuncio (
     cant_operaciones_concretadas numeric,
     monto_total_operaciones_concretadas numeric,
     promedio_comision numeric,
-    FOREIGN KEY (tiempo) REFERENCES ANDY_Y_SUS_SEMINARAS.BI_dim_tiempo(id_tiempo),
+    FOREIGN KEY (tiempo) REFERENCES ANDY_Y_SUS_SEMINARAS.BI_dim_tiempo(id_tiempo),--
     FOREIGN KEY (ubicacion) REFERENCES ANDY_Y_SUS_SEMINARAS.BI_dim_ubicacion(id_ubicacion),
     FOREIGN KEY (sucursal) REFERENCES ANDY_Y_SUS_SEMINARAS.BI_dim_sucursal(codigo_sucursal),
     FOREIGN KEY (rango_etario_agentes) REFERENCES ANDY_Y_SUS_SEMINARAS.BI_dim_rango_etario(id_rango_etario),
