@@ -110,8 +110,6 @@ BEGIN
 		alquiler_cuatrimestre_inicio numeric(18,0),
 		alquiler_mes_inicio numeric(18,0),
 		alquiler_comision numeric(18,0),
-	   --alquiler_porcentaje_incumplimiento numeric(18,2) , DUDOSO
-	   --alquiler_porcentaje_promedio_incremento numeric(18,2), DUDOSO
 		PRIMARY KEY(alquiler_rango_etario_inquilino,alquiler_barrio,alquiler_anio_inicio,
 		alquiler_cuatrimestre_inicio, alquiler_mes_inicio)
 	)
@@ -120,28 +118,35 @@ BEGIN
 	REFERENCES LOS_BORBOTONES.BI_D_TIEMPO(tiempo_anio, tiempo_cuatri, tiempo_mes)
 
 	--CREACION TABLA DE HECHOS DE LAS VENTAS
-	/*CREATE TABLE LOS_BORBOTONES.BI_TH_Ventas (
+	CREATE TABLE LOS_BORBOTONES.BI_TH_Ventas (
 		venta_moneda numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Moneda(moneda_codigo) NOT NULL,
-		venta_rango_etario_inquilino numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_RangoEtario(rangoEtario_codigo), 
+		venta_localidad numeric (18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Localidad(localidad_codigo) NOT NULL,
+		venta_tipo_inmueble numeric (18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_TipoInmueble(localidad_codigo) NOT NULL,
 		venta_anio_inicio numeric(18,0),
 		venta_cuatrimestre_inicio numeric(18,0),
 		venta_mes_inicio numeric(18,0),
-		venta_fecha smalldatetime, 
-		venta_comision numeric(18,2),
-		venta_precio numeric(18,2),
-		venta_cuatrimestre numeric(18,2),
-		PRIMARY KEY(venta_moneda,venta_rango_etario_inquilino,venta_anio_inicio)
-	)*/
+		venta_precio_promedio_m2 numeric(18,2),
+		venta_cantidad_ventas numeric (18,0)
+		PRIMARY KEY(venta_moneda,venta_localidad,venta_tipo_inmueble,venta_anio_inicio,venta_cuatrimestre_inicio,venta_mes_inicio)
+	)
+
+	ALTER TABLE LOS_BORBOTONES.BI_TH_Ventas
+	ADD CONSTRAINT FK_Tiempo_Ventas FOREIGN KEY (venta_anio_inicio, venta_mes_inicio, venta_cuatrimestre_inicio) 
+	REFERENCES LOS_BORBOTONES.BI_D_TIEMPO(tiempo_anio, tiempo_cuatri, tiempo_mes)
 
 	--CREACION TABLA DE HECHOS DE PAGO ALQUILER
 	CREATE TABLE LOS_BORBOTONES.BI_TH_PagoAlquiler (
 		pagoalquiler_anio_pago numeric(18,0),
+		pagoalquiler_cuatrimestre_pago numeric(18,0),
 		pagoalquiler_mes_pago numeric(18,0),
-		pagoalquiler_porcentaje_incumplimiento numeric(18,2),
 		pagoalquiler_cant_pagos numeric(18,0),
+		pagoalquiler_porcentaje_incumplimiento numeric(18,2),
 		pagoalquiler_porcentaje_aumento numeric(18,2)
 	)
 
+	ALTER TABLE LOS_BORBOTONES.BI_TH_Ventas
+	ADD CONSTRAINT FK_Tiempo_PagoAlquiler FOREIGN KEY (pagoalquiler_anio_pago, pagoalquiler_cuatrimestre_pago, pagoalquiler_mes_pago) 
+	REFERENCES LOS_BORBOTONES.BI_D_TIEMPO(tiempo_anio, tiempo_cuatri, tiempo_mes)
 END
 GO
 
@@ -393,30 +398,26 @@ BEGIN
 	MONTH(pagoactual.pagoAlquiler_fechaPago)
 
 	--MIGRACIÓN BI_TH_Ventas
-	/*INSERT INTO LOS_BORBOTONES.BI_TH_Ventas 
+	INSERT INTO LOS_BORBOTONES.BI_TH_Ventas 
 		(venta_moneda,
-		--venta_rango_etario_inquilino,
+		venta_localidad ,
+		venta_tipo_inmueble,
 		venta_anio_inicio,
-		venta_cuatrimestre_inicio ,
-		venta_mes,
-		venta_fecha,
-		venta_comision,
-		venta_precio, 
-		venta_cuatrimestre,
-		venta_precio_promedio,
-		venta_inmueble_detalle,
-		venta_re_agente)
+		venta_cuatrimestre_inicio,
+		venta_mes_inicio,
+		venta_precio_promedio_m2 ,
+		venta_cantidad_ventas)
 	SELECT 
 		v.venta_moneda,
-		--rango etario?
-		YEAR(v.venta_fecha) AS 'Año',
+		YEAR(v.venta_fecha) AS 'Año de la venta',
+		barrio_localidad AS 'Barrio del inmueble vendido',
 		LOS_BORBOTONES.Cuatrimestre(v.venta_fecha) AS 'Cuatrimestre ',
 		MONTH(v.venta_fecha) AS 'Mes de la venta',
 		v.venta_fecha AS 'Fecha',
 		AVG(v.venta_Comision) AS 'Comision de la venta',
 		AVG(v.venta_total_precio_m2) AS 'Total precio por M2',
 		tipoInmueble_detalle AS 'Tipo de inmueble vendido',
-		barrio_localidad AS 'Barrio del inmueble vendido',
+		
 		AVG(v.precio_venta / LOS_BORBOTONES.ObtenerRangoM2( inmueble_superficie)) 'precio promedio por Metro Cuadrado',
 		LOS_BORBOTONES.ObtenerRangoEtario(persona_fecha_nacimiento) AS 'Rango etario del agente'
 	FROM LOS_BORBOTONES.Venta v
@@ -554,7 +555,7 @@ GO
 la localidad para cada cuatrimestre/año. Se calcula en función de las ventas
 concretadas.*/
 
-/*CREATE VIEW LOS_BORBOTONES.vista_precio_promedio_M2Ventas
+CREATE VIEW LOS_BORBOTONES.vista_precio_promedio_M2Ventas
 AS
 SELECT 
     venta_anio_inicio as 'Anio de inicio',
@@ -572,7 +573,7 @@ GROUP BY
     tipo_inmueble_detalle,
     venta_localidad,
     moneda_detalle
-GO*/
+GO
 
 /*7. Valor promedio de la comisión según el tipo de operación (alquiler, venta, etc)
 y sucursal para cada cuatrimestre/año. Se calcula en función de los alquileres y
