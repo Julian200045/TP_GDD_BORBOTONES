@@ -76,7 +76,6 @@ BEGIN
 
 	--CREACION TABLA DE HECHOS DE LOS ANUNCIOS
 	CREATE TABLE LOS_BORBOTONES.BI_TH_Anuncio (
-		anuncio_codigo numeric(19,0) IDENTITY(1,1),
 		anuncio_tipoOperacion numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_TipoOperacion(tipoOperacion_codigo),
 		anuncio_moneda numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Moneda(moneda_codigo), 
 		anuncio_ambientes numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Ambientes(ambientes_codigo), 
@@ -89,15 +88,16 @@ BEGIN
 		anuncio_cuatrimestre_publicacion numeric(18,0), 
 		anuncio_mes_publicacion  numeric(18,0),
 		anuncio_precioPromedio numeric(18,2),
-		anuncio_duracion_en_dias numeric(18,0), --despues le harias el average este no seria foreign key
+		anuncio_duracion_en_dias numeric(18,0), 
 		anuncio_comision_promedio numeric(18,2),
 		anuncio_cantidad_anuncios numeric(18,0),
 		cant_operaciones_concretadas numeric(18,0),
 		monto_total_operaciones_concretadas numeric(18,0),
-		PRIMARY KEY(anuncio_codigo,anuncio_tipoOperacion, anuncio_moneda, anuncio_ambientes,anuncio_tipo_inmueble,
-		anuncio_rango_metros_cuadrados,anuncio_anio_publicacion,anuncio_cuatrimestre_publicacion,
-		anuncio_mes_publicacion,anuncio_barrio,anuncio_sucursal)    	
+		PRIMARY KEY(anuncio_tipoOperacion, anuncio_moneda, anuncio_ambientes,anuncio_tipo_inmueble,
+		anuncio_rango_metros_cuadrados,anuncio_rango_etario_agente,anuncio_anio_publicacion,
+		anuncio_cuatrimestre_publicacion,anuncio_mes_publicacion,anuncio_barrio,anuncio_sucursal)    	
 	)
+
 	ALTER TABLE LOS_BORBOTONES.BI_TH_Anuncio
 	ADD CONSTRAINT FK_Tiempo_Anuncio FOREIGN KEY (anuncio_anio_publicacion, anuncio_cuatrimestre_publicacion, anuncio_mes_publicacion) 
 	REFERENCES LOS_BORBOTONES.BI_D_TIEMPO(tiempo_anio, tiempo_cuatri, tiempo_mes)
@@ -323,12 +323,7 @@ BEGIN
 		AVG(DATEDIFF(DAY, a.anuncio_fechaPublicacion, a.anuncio_fechaFinalizacion)) AS 'Cant dias publicacion-finalizacion',
 		LOS_BORBOTONES.ObtenerRangoEtario(persona_fecha_nacimiento) AS 'Rango Etario del agente',
 		agente_sucursal AS 'Sucursal donde fue publicado el anuncio' ,
-		CASE 
-		WHEN anuncio_tipoOperacion = 3 THEN 
-			(SELECT AVG(venta_comision) FROM Venta WHERE anuncio_codigo = venta_anuncio)
-		ELSE 
-			(SELECT AVG(alquiler_comision) FROM Alquiler WHERE anuncio_codigo = alquiler_anuncio_codigo)
-		END AS 'Promedio comision',
+		AVG(ISNULL((CASE WHEN anuncio_tipoOperacion < 3 THEN alq.alquiler_comision WHEN anuncio_tipoOperacion = 3 THEN v.venta_comision ELSE 0 END),0)) AS 'Promedio Comision',
 		COUNT(*) AS 'Cantidad Anuncios',
 		SUM(CASE WHEN alq.alquiler_codigo IS NOT NULL OR v.venta_codigo IS NOT NULL THEN 1 ELSE 0 END) AS 'Cantidad operaciones concretadas',
 		SUM(CASE WHEN alq.alquiler_codigo IS NOT NULL OR v.venta_codigo IS NOT NULL THEN a.anuncio_precioPublicado ELSE 0 END) AS 'Monto total operaciones concretadas'
@@ -340,8 +335,7 @@ BEGIN
 	JOIN LOS_BORBOTONES.persona ON agente_persona = persona_codigo
 	LEFT JOIN LOS_BORBOTONES.Venta v ON a.anuncio_codigo = v.venta_anuncio
     LEFT JOIN LOS_BORBOTONES.Alquiler alq ON a.anuncio_codigo = alq.alquiler_anuncio_codigo
-	GROUP BY
-		YEAR(a.anuncio_fechaPublicacion),
+	GROUP BY YEAR(a.anuncio_fechaPublicacion),
 		LOS_BORBOTONES.Cuatrimestre(a.anuncio_fechaPublicacion) ,
 		MONTH(a.anuncio_fechaPublicacion),
         inmueble_barrio,
@@ -351,8 +345,7 @@ BEGIN
         inmueble_ambientes,
         LOS_BORBOTONES.ObtenerRangoM2(inmueble_superficie),
 		anuncio_tipoOperacion,
-        anuncio_moneda,
-		anuncio_codigo
+        anuncio_moneda
 
 	--MIGRACIÓN BI_TH_Alquiler
 	INSERT INTO LOS_BORBOTONES.BI_TH_Alquiler 
