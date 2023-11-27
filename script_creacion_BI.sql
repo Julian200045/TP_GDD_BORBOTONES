@@ -557,18 +557,15 @@ concretadas.*/
 
 CREATE VIEW LOS_BORBOTONES.vista_precio_promedio_M2Ventas
 AS
-SELECT 
-    venta_anio_inicio as 'Anio de inicio',
+SELECT venta_anio_inicio as 'Anio de inicio',
     venta_cuatrimestre_inicio as 'Cuatrimestre de venta',
     tipo_inmueble_detalle AS 'Tipo de inmueble',
     venta_localidad as 'Localidad en donde se vendio',
     SUM(venta_precio_promedio_m2 * venta_cantidad_ventas)/SUM(venta_cantidad_ventas) AS 'Precio promedio por venta'
-FROM
-    LOS_BORBOTONES.BI_TH_Ventas
+FROM LOS_BORBOTONES.BI_TH_Ventas
     JOIN LOS_BORBOTONES.BI_D_TipoInmueble ON venta_tipo_inmueble = tipo_inmueble_codigo
 	JOIN LOS_BORBOTONES.BI_D_Moneda on venta_moneda = moneda_codigo
-GROUP BY
-    venta_anio_inicio,
+GROUP BY venta_anio_inicio,
     venta_cuatrimestre_inicio,
     tipo_inmueble_detalle,
     venta_localidad,
@@ -581,8 +578,7 @@ ventas concretadas dentro del periodo.*/
 
 CREATE VIEW LOS_BORBOTONES.vista_valor_promedio_comision
 AS
-SELECT 
-   	tipoOperacion_detalle AS 'Tipo Operacion',
+SELECT tipoOperacion_detalle AS 'Tipo Operacion',
     sucursal_detalle AS 'Sucursal',
 	anuncio_anio_publicacion AS 'Anio publicacion anuncio',
     anuncio_cuatrimestre_publicacion AS 'Cuatrimestre publicacion anuncio',
@@ -590,8 +586,7 @@ SELECT
 FROM LOS_BORBOTONES.BI_TH_Anuncio 
     JOIN LOS_BORBOTONES.BI_D_TipoOperacion ON anuncio_tipoOperacion = tipoOperacion_codigo
     JOIN LOS_BORBOTONES.BI_D_Sucursal ON anuncio_sucursal = sucursal_codigo
-GROUP BY
-    tipoOperacion_detalle,
+GROUP BY tipoOperacion_detalle,
     sucursal_detalle,
 	anuncio_anio_publicacion,
     anuncio_cuatrimestre_publicacion
@@ -603,8 +598,7 @@ cantidad de anuncios publicados en ese mismo año.*/
 
 CREATE VIEW LOS_BORBOTONES.vista_porcentaje_operaciones_concretadas
 AS
-SELECT 
-	t.tiempo_anio,
+SELECT t.tiempo_anio,
 	t.tiempo_cuatri,
 	s.sucursal_detalle,
 	r.rangoEtario_Inicio,
@@ -614,8 +608,7 @@ FROM LOS_BORBOTONES.BI_TH_Anuncio AS a
 	JOIN LOS_BORBOTONES.BI_D_TIEMPO AS t ON CONCAT(a.anuncio_anio_publicacion, a.anuncio_cuatrimestre_publicacion, a.anuncio_mes_publicacion) = CONCAT(t.tiempo_anio, t.tiempo_cuatri, t.tiempo_mes)
 	JOIN LOS_BORBOTONES.Sucursal AS s ON a.anuncio_sucursal = s.sucursal_codigo
 	JOIN LOS_BORBOTONES.BI_D_RangoEtario AS r ON a.anuncio_rango_etario_agente = r.rangoEtario_codigo
-GROUP BY 
-	t.tiempo_anio,
+GROUP BY t.tiempo_anio,
 	t.tiempo_cuatri,
 	s.sucursal_detalle,
 	r.rangoEtario_Inicio,
@@ -625,10 +618,9 @@ GO
 /*Vista 9: Monto total de cierre de contratos por tipo de operación (tanto de alquileres
 como ventas) por cada cuatrimestre y sucursal, diferenciando el tipo de moneda.*/
 
-CREATE VIEW LOS_BORBOTONES.BI_Vista_CierreContratos
+CREATE VIEW LOS_BORBOTONES.vista_monto_total_cierre_contratos
 AS
-SELECT
-	t.tiempo_anio,
+SELECT t.tiempo_anio,
 	t.tiempo_cuatri,
 	s.sucursal_codigo,
 	tipoO.tipoOperacion_detalle,
