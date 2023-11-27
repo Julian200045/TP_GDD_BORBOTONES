@@ -121,7 +121,7 @@ BEGIN
 	CREATE TABLE LOS_BORBOTONES.BI_TH_Ventas (
 		venta_moneda numeric(18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Moneda(moneda_codigo) NOT NULL,
 		venta_localidad numeric (18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_Localidad(localidad_codigo) NOT NULL,
-		venta_tipo_inmueble numeric (18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_TipoInmueble(localidad_codigo) NOT NULL,
+		venta_tipo_inmueble numeric (18,0) FOREIGN KEY REFERENCES LOS_BORBOTONES.BI_D_TipoInmueble(tipo_inmueble_codigo) NOT NULL,
 		venta_anio_inicio numeric(18,0),
 		venta_cuatrimestre_inicio numeric(18,0),
 		venta_mes_inicio numeric(18,0),
@@ -131,7 +131,7 @@ BEGIN
 	)
 
 	ALTER TABLE LOS_BORBOTONES.BI_TH_Ventas
-	ADD CONSTRAINT FK_Tiempo_Ventas FOREIGN KEY (venta_anio_inicio, venta_mes_inicio, venta_cuatrimestre_inicio) 
+	ADD CONSTRAINT FK_Tiempo_Ventas FOREIGN KEY (venta_anio_inicio, venta_cuatrimestre_inicio, venta_mes_inicio) 
 	REFERENCES LOS_BORBOTONES.BI_D_TIEMPO(tiempo_anio, tiempo_cuatri, tiempo_mes)
 
 	--CREACION TABLA DE HECHOS DE PAGO ALQUILER
@@ -144,7 +144,7 @@ BEGIN
 		pagoalquiler_porcentaje_aumento numeric(18,2)
 	)
 
-	ALTER TABLE LOS_BORBOTONES.BI_TH_Ventas
+	ALTER TABLE LOS_BORBOTONES.BI_TH_PagoAlquiler
 	ADD CONSTRAINT FK_Tiempo_PagoAlquiler FOREIGN KEY (pagoalquiler_anio_pago, pagoalquiler_cuatrimestre_pago, pagoalquiler_mes_pago) 
 	REFERENCES LOS_BORBOTONES.BI_D_TIEMPO(tiempo_anio, tiempo_cuatri, tiempo_mes)
 END
@@ -383,11 +383,13 @@ BEGIN
 	--MIGRACIÓN BI_TH_PagoAlquiler
 	INSERT INTO LOS_BORBOTONES.BI_TH_PagoAlquiler
 		(pagoalquiler_anio_pago,
+		pagoalquiler_cuatrimestre_pago,
 		pagoalquiler_mes_pago,
 		pagoalquiler_porcentaje_incumplimiento,
 		pagoalquiler_cant_pagos,
 		pagoalquiler_porcentaje_aumento)	
 	SELECT YEAR(pagoactual.pagoAlquiler_fechaPago) AS 'Año de pago',
+		LOS_BORBOTONES.Cuatrimestre(pagoactual.pagoAlquiler_fechaPago) AS 'Cuatrimestre de pago',
 		MONTH(pagoactual.pagoAlquiler_fechaPago) AS 'Mes de pago',
 		SUM(CASE WHEN (DATEDIFF(DAY, pagoactual.pagoAlquiler_fechaPago, pagoactual.pagoAlquiler_fechaFinPeriodo) < 0) THEN 1 ELSE 0 END) / COUNT(*) * 100 AS 'Porcentaje Incumplimiento',
 		COUNT(*) AS 'Cantidad de pagos',
@@ -395,6 +397,7 @@ BEGIN
 	FROM LOS_BORBOTONES.PagoAlquiler pagoactual
 	JOIN LOS_BORBOTONES.PagoAlquiler pagoanterior ON pagoanterior.pagoAlquiler_alquiler = pagoactual.pagoAlquiler_alquiler AND DATEDIFF(MONTH,pagoanterior.pagoAlquiler_fechaPago,pagoactual.pagoAlquiler_fechaPago) = 1 
 	GROUP BY YEAR(pagoactual.pagoAlquiler_fechaPago),
+	LOS_BORBOTONES.Cuatrimestre(pagoactual.pagoAlquiler_fechaPago),
 	MONTH(pagoactual.pagoAlquiler_fechaPago)
 
 	--MIGRACIÓN BI_TH_Ventas
@@ -405,30 +408,27 @@ BEGIN
 		venta_anio_inicio,
 		venta_cuatrimestre_inicio,
 		venta_mes_inicio,
-		venta_precio_promedio_m2 ,
+		venta_precio_promedio_m2,
 		venta_cantidad_ventas)
-	SELECT 
-		v.venta_moneda,
-		YEAR(v.venta_fecha) AS 'Año de la venta',
+	SELECT v.venta_moneda,
 		barrio_localidad AS 'Barrio del inmueble vendido',
+		inmueble_tipo AS 'Tipo de inmueble vendido',
+		YEAR(v.venta_fecha) AS 'Año de la venta',
 		LOS_BORBOTONES.Cuatrimestre(v.venta_fecha) AS 'Cuatrimestre ',
 		MONTH(v.venta_fecha) AS 'Mes de la venta',
-		v.venta_fecha AS 'Fecha',
-		AVG(v.venta_Comision) AS 'Comision de la venta',
-		AVG(v.venta_total_precio_m2) AS 'Total precio por M2',
-		tipoInmueble_detalle AS 'Tipo de inmueble vendido',
-		
-		AVG(v.precio_venta / LOS_BORBOTONES.ObtenerRangoM2( inmueble_superficie)) 'precio promedio por Metro Cuadrado',
-		LOS_BORBOTONES.ObtenerRangoEtario(persona_fecha_nacimiento) AS 'Rango etario del agente'
+		AVG(v.venta_precio / LOS_BORBOTONES.ObtenerRangoM2(inmueble_superficie)) 'precio promedio por Metro Cuadrado',
+		count(distinct v.venta_codigo) as 'Cantidad de ventas'
 	FROM LOS_BORBOTONES.Venta v
 	JOIN LOS_BORBOTONES.Anuncio ON anuncio_codigo = v.venta_anuncio
 	JOIN LOS_BORBOTONES.Inmueble ON anuncio_inmueble = inmueble_codigo 
 	JOIN LOS_BORBOTONES.Barrio ON barrio_codigo = inmueble_barrio
-	JOIN LOS_BORBOTONES.agente ON agente_codigo = anuncio_agente
-	JOIN LOS_BORBOTONES.persona ON persona_codigo = agente_persona  
-	JOIN LOS_BORBOTONES.tipoInmueble ON tipoInmueble_codigo = inmueble_tipo
-	--GROUP BY LOS_BORBOTONES.Cuatrimestre(v.venta_fecha), YEAR(v.venta_fecha)*/
-
+	GROUP BY v.venta_moneda, 
+		barrio_localidad,
+		inmueble_tipo,
+		YEAR(v.venta_fecha),
+		LOS_BORBOTONES.Cuatrimestre(v.venta_fecha),
+		MONTH(v.venta_fecha)
+	
 END
 GO
 
@@ -562,11 +562,11 @@ SELECT
     venta_cuatrimestre_inicio as 'Cuatrimestre de venta',
     tipo_inmueble_detalle AS 'Tipo de inmueble',
     venta_localidad as 'Localidad en donde se vendio',
-    SUM(venta_precio_promedio * venta_cantidad_ventas)/SUM(venta_cantidad_ventas) AS 'Precio promedio por venta'
+    SUM(venta_precio_promedio_m2 * venta_cantidad_ventas)/SUM(venta_cantidad_ventas) AS 'Precio promedio por venta'
 FROM
     LOS_BORBOTONES.BI_TH_Ventas
     JOIN LOS_BORBOTONES.BI_D_TipoInmueble ON venta_tipo_inmueble = tipo_inmueble_codigo
-	JOIN LOS_BORBOTONES.BI_D_Tipo_moneda on venta_tipo_moneda = moneda_codigo
+	JOIN LOS_BORBOTONES.BI_D_Moneda on venta_moneda = moneda_codigo
 GROUP BY
     venta_anio_inicio,
     venta_cuatrimestre_inicio,
@@ -575,7 +575,7 @@ GROUP BY
     moneda_detalle
 GO
 
-/*7. Valor promedio de la comisión según el tipo de operación (alquiler, venta, etc)
+/*Vista 7: Valor promedio de la comisión según el tipo de operación (alquiler, venta, etc)
 y sucursal para cada cuatrimestre/año. Se calcula en función de los alquileres y
 ventas concretadas dentro del periodo.*/
 
@@ -597,9 +597,9 @@ GROUP BY
     anuncio_cuatrimestre_publicacion
 GO
 
-/*Vista 8. Porcentaje de operaciones concretadas (tanto de alquileres como ventas) por
--- cada sucursal, según el rango etario de los empleados por año en función de la
--- cantidad de anuncios publicados en ese mismo año.*/
+/*Vista 8: Porcentaje de operaciones concretadas (tanto de alquileres como ventas) por
+cada sucursal, según el rango etario de los empleados por año en función de la
+cantidad de anuncios publicados en ese mismo año.*/
 
 CREATE VIEW LOS_BORBOTONES.vista_porcentaje_operaciones_concretadas
 AS
@@ -622,7 +622,7 @@ GROUP BY
 	r.rangoEtario_Fin
 GO
 
-/*Vista 9. Monto total de cierre de contratos por tipo de operación (tanto de alquileres
+/*Vista 9: Monto total de cierre de contratos por tipo de operación (tanto de alquileres
 como ventas) por cada cuatrimestre y sucursal, diferenciando el tipo de moneda.*/
 
 CREATE VIEW LOS_BORBOTONES.BI_Vista_CierreContratos
